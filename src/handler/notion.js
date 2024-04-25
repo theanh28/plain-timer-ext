@@ -1,7 +1,8 @@
 import { createOneEvent } from '../api/ggCalendar.js';
 import { CalendarTaskClient } from '../api/notion.js'
+import { NOTION_DB } from '../secrets.js';
 
-const OUR_DB = '0b4a231003b94290b141233f85f913b3'
+const OUR_DB = NOTION_DB
 
 /**
  * Sets up a Notion task + GG calendar at due.

@@ -1,8 +1,9 @@
 import { Client } from "@notionhq/client"
+import { NOTION_API } from "../secrets"
 
 const CalendarTaskClient = {
   notion: new Client({
-    auth: 'secret_GT13SsLoAGnivAXtCOFCnD5kGRKYaqaRzyIcOdH9Sfx',
+    auth: NOTION_API,
   }),
 
   /**
