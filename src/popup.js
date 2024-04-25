@@ -1,112 +1,67 @@
 'use strict';
 
-import './popup.css';
+// Function to populate input fields with current task name and timer interval
+async function populateInputFields() {
+  const { timer } = await chrome.storage.local.get('timer');
+  document.getElementById("taskNameInput").value = timer.taskName || '';
+  document.getElementById("intervalInput").value = timer.interval || 0;
+}
 
-(function () {
-  // We will make use of Storage API to get and store `count` value
-  // More information on Storage API can we found at
-  // https://developer.chrome.com/extensions/storage
+// Call populateInputFields function when popup is opened
+populateInputFields();
 
-  // To get storage access, we have to mention it in `permissions` property of manifest.json file
-  // More information on Permissions can we found at
-  // https://developer.chrome.com/extensions/declare_permissions
-  const counterStorage = {
-    get: (cb) => {
-      chrome.storage.sync.get(['count'], (result) => {
-        cb(result.count);
-      });
-    },
-    set: (value, cb) => {
-      chrome.storage.sync.set(
-        {
-          count: value,
-        },
-        () => {
-          cb();
-        }
-      );
-    },
-  };
+function setTimer() {
+  const taskName = document.getElementById("taskNameInput").value;
+  const interval = parseInt(document.getElementById("intervalInput").value);
+  chrome.runtime.sendMessage({ action: "setTimer", taskName, interval });
 
-  function setupCounter(initialValue = 0) {
-    document.getElementById('counter').innerHTML = initialValue;
+  document.getElementById("confirmText").textContent = "Task timer SET";
+}
 
-    document.getElementById('incrementBtn').addEventListener('click', () => {
-      updateCounter({
-        type: 'INCREMENT',
-      });
-    });
+function clearTimer() {
+  chrome.runtime.sendMessage({ action: "clearTimer" });
 
-    document.getElementById('decrementBtn').addEventListener('click', () => {
-      updateCounter({
-        type: 'DECREMENT',
-      });
-    });
+  document.getElementById("taskNameInput").value = '';
+  document.getElementById("intervalInput").value = 0;
+  document.getElementById("confirmText").textContent = "Task timer CLEARED";
+}
+
+// Function to handle creation of calendar task
+function createCalendarTask() {
+  // Getting input values
+  const taskName = document.getElementById("calendarTaskInput").value;
+  const dueDate = document.getElementById("dueDateInput").value;
+
+  // Validation - checking if both fields are filled
+  if (taskName.trim() === "") {
+    document.getElementById("taskConfirmationText").textContent = "Task name?";
+    return;
   }
 
-  function updateCounter({ type }) {
-    counterStorage.get((count) => {
-      let newCount;
+  // Processing due date input (optional, depending on your needs)
+  // default = no due = empty string
+  console.log('[X] time', `**${dueDate}**`)
+  const dueDateObject = dueDate ? new Date(dueDate) : undefined;
 
-      if (type === 'INCREMENT') {
-        newCount = count + 1;
-      } else if (type === 'DECREMENT') {
-        newCount = count - 1;
-      } else {
-        newCount = count;
-      }
+  // Invoke the background spell.
+  chrome.runtime.sendMessage({ action: "addTask", taskName, due: dueDateObject });
 
-      counterStorage.set(newCount, () => {
-        document.getElementById('counter').innerHTML = newCount;
+  // Displaying confirmation message
+  document.getElementById("taskConfirmationText").textContent = "Task created!";
+}
 
-        // Communicate with content script of
-        // active tab by sending a message
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          const tab = tabs[0];
+// Add task listener to the Set Timer button
+document.getElementById("setTimerButton").addEventListener("click", setTimer);
+// Add task listener for "Enter" key press in Inputs
+document.getElementById("taskNameInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") setTimer();
+});
+document.getElementById("intervalInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") setTimer();
+});
 
-          chrome.tabs.sendMessage(
-            tab.id,
-            {
-              type: 'COUNT',
-              payload: {
-                count: newCount,
-              },
-            },
-            (response) => {
-              console.log('Current count value passed to contentScript file');
-            }
-          );
-        });
-      });
-    });
-  }
+// Clear Timer btn
+document.getElementById("clearTimerButton").addEventListener("click", clearTimer);
 
-  function restoreCounter() {
-    // Restore count value
-    counterStorage.get((count) => {
-      if (typeof count === 'undefined') {
-        // Set counter value as 0
-        counterStorage.set(0, () => {
-          setupCounter(0);
-        });
-      } else {
-        setupCounter(count);
-      }
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', restoreCounter);
-
-  // Communicate with background file by sending a message
-  chrome.runtime.sendMessage(
-    {
-      type: 'GREETINGS',
-      payload: {
-        message: 'Hello, my name is Pop. I am from Popup.',
-      },
-    },
-    (response) => {
-      console.log(response.message);
-    }
-  );
-})();
+// Adding task listener to the "Create task" button
+document.getElementById("createTaskButton").addEventListener("click", createCalendarTask);

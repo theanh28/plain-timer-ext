@@ -1,32 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>My Chrome Extension</title>
-    <link rel="stylesheet" href="popup.css" />
-  </head>
-  <body>
-    <div class="app">
-      <p class="counter-label">Counter</p>
-      <div id="counter" class="counter"></div>
-      <div class="button-container">
-        <button id="decrementBtn" class="button">-</button>
-        <button id="incrementBtn" class="button">+</button>
-      </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADHD Timer</title>
+  <script src="popup.js" defer></script>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h2>Timer Settings</h2>
+  <h3>Task Timer</h3>
+  <div>
+    <h4>Task Name</h4>
+    <input type="text" id="taskNameInput">
+    <h4>Timer Interval (minutes)</h4>
+    <input type="number" id="intervalInput">
+    <button id="setTimerButton">Set Timer</button>
+    <button id="clearTimerButton">Clear</button>
+    <p id="confirmText" class="confirm-text"></p>
+  </div>
 
-      <hr class="divider" />
-
-      <p class="title">Chrome Extension is Ready!</p>
-      <p class="subtitle">Start by updating <code>popup.html</code></p>
-    </div>
-
-    <script src="popup.js"></script>
-
-    <!--
-      This HTML file opens when you click on icon from the toolbar.
-
-      To begin the development, run `npm run watch`.
-      To create a production bundle, use `npm run build`.
-    -->
-  </body>
+  <h3>Calendar Task</h3>
+  <div>
+    <h4>Task Name</h4>
+    <input type="text" id="calendarTaskInput">
+    <h4>Due Date</h4>
+    <input type="datetime-local" id="dueDateInput">
+    <button id="createTaskButton">Create Task</button>
+    <p id="taskConfirmationText" class="confirm-text"></p>
+  </div>
+</body>
 </html>

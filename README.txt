@@ -1,0 +1,1 @@
+Simplest interval timer to remind you of task. Made this because people keep overcomplicate things with pomodoro and weird ass timer that doesn't work. Sometimes, just an interval timer is enuf. Nicer if it's an extension.
